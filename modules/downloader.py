@@ -62,6 +62,7 @@ def _build_local_file_name(head_resp):
     return filename
 
 def _get_file(url, dest_file, remote_last_modified_dt):
+    os.makedirs(constants.downloads_dir, exist_ok=True)
     full_path = os.path.join(constants.downloads_dir, dest_file)
     with requests.get(url, headers=HEADERS, stream=True) as r:
         r.raise_for_status()
