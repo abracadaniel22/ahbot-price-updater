@@ -4,7 +4,7 @@ Downloads and parsers auctioneer data file and populate the tables used by mod-a
 
 This requires Abracadaniel22's fork of mod-ah-bot https://github.com/abracadaniel22/mod-ah-bot .
 
-This script works by populating the `ac_world.mod_ahbot` table with the minimum bid price of all items found in the auctioneer data file.
+This script works by populating the `ac_world.mod_ahbot` table with the minimum bid price of all items found in the auctioneer data file. The AHBot will use those prices to create auctions and buy your auctions, ultimately simulating the real world with real world data (depending on where you get your auctioneer data file from).
 
 ## Installation
 
