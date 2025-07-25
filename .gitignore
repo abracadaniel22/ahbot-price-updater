@@ -1,4 +1,4 @@
-#etc/data/*
+etc/data/*
 etc/conf/*.conf
 
 # Byte-compiled / optimized / DLL files
