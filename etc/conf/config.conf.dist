@@ -1,0 +1,15 @@
+[config]
+
+# Url of the auctioneer data file
+url = https://file.file
+
+# For testing. Skip download and just use the latest file. Default: false
+skip_download = false
+
+# DB connection settings
+mysql_host = 192.168.68.127
+mysql_port = 3306
+mysql_user = acore
+mysql_password = acore
+# Database where the mod_ahbot table is located. Default: acore_world
+mysql_database = acore_world
