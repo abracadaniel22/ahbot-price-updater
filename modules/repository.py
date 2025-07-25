@@ -8,7 +8,7 @@ from enum import Enum, auto
 from .config import config
 
 CURSOR_RESULT_ROW_INSERTED = 1
-CURSOR_RESULT_ROW_UPDATED = 2 # this is pretty damn useless
+CURSOR_RESULT_ROW_UPDATED = 2
 CURSOR_RESULT_KEPT_SAME = 0
 
 class UpsertResult(Enum):

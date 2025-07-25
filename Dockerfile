@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /usr/src/app
 COPY app.py .
 COPY modules/*.py ./modules/
-#COPY etc/ ./etc/
 COPY requirements.txt .
 COPY VERSION .
 
