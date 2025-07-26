@@ -50,10 +50,10 @@ def _main():
     repository = Repository()
     stats = Counter()
 
-    print("Updating table...")
     upsert = True
     if config.insert_duplicate_behaviour == 'ignore':
         upsert = False
+    print(f"Updating table. Existing items will be {'overwritten' if upsert else 'ignored'}...")
     for item_id, data in item_prices.items():
         if not data['min_prices'] or not data['max_prices']:
             continue

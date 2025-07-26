@@ -1,4 +1,4 @@
-[config]
+[default]
 
 # Url of the auctioneer data file
 url = https://file.file

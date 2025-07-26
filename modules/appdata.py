@@ -18,7 +18,7 @@ def _get_file():
     if not os.path.exists(data_file):
         os.makedirs(data_dir, exist_ok=True)
         with open(data_file, 'w') as fp:
-            fp.write("[config]")
+            fp.write("[default]")
     return data_file
 
 appdata = TypedConfig(_get_file(), _schema)

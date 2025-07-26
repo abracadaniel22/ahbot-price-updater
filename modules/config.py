@@ -31,4 +31,7 @@ def _get_file():
     else:
         raise RuntimeError(f"None of the config files are found: [{config_file}] or [{config_dist_file}].")
 
-config = TypedConfig(_get_file(), _schema, env_prefix="CONFIG_")
+section = "default"
+if "CONFIG_PROFILE" in os.environ:
+    section = os.environ["CONFIG_PROFILE"]
+config = TypedConfig(_get_file(), _schema, section=section)

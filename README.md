@@ -32,13 +32,22 @@ git clone https://github.com/abracadaniel22/ahbot-price-updater.git
 - Run via docker, mounting the `etc` folder so the VM can read configuration files and write data to a data dir
 
 ```
-docker run -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
+docker run -t -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
 ```
 
-## Overriding configuration
+## Configuration profiles
 
-- It is possible to override the values in the config file for a single execution without modifying the config file, just set environment variables matching the keys in the config file, prefixed with `CONFIG_`, example:
+- It is possible to have additional configuration profiles in the config file other than the `default`. Just add new sections to the config file, for example:
 
 ```
-docker run -e CONFIG_URL="https://custom-onetime-url.com" -e CONFIG_INSERT_DUPLICATE_BEHAVIOUR=ignore -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
+[my_other_server]
+url = https://my_other_server_url
+keep_downloads = false
+insert_duplicate_behaviour = ignore
+```
+
+- To make the script use my_other_server, just set the environment variable `CONFIG_PROFILE`, like the following example:
+
+```
+docker run -t -e CONFIG_PROFILE="my_other_server" -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
 ```
