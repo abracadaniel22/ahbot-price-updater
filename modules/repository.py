@@ -11,7 +11,7 @@ CURSOR_RESULT_ROW_INSERTED = 1
 CURSOR_RESULT_ROW_UPDATED = 2
 CURSOR_RESULT_KEPT_SAME = 0
 
-class UpsertResult(Enum):
+class InsertResult(Enum):
     INSERTED = auto()
     UPDATED = auto()
     KEPT_SAME = auto()
@@ -41,7 +41,27 @@ class Repository:
             cursor.execute("SELECT COUNT(item_id) FROM mod_ahbot;")
         return cursor.fetchone()[0]
 
-    def upsert(self, item_id: int, min_bid_price: int) -> UpsertResult:
+    def insert_ignore(self, item_id: int, min_bid_price: int) -> InsertResult:
+        if not self.connection or not self.connection.is_connected():
+            raise RuntimeError("Cannot perform insert, no connection.")
+
+        sql = """
+            INSERT IGNORE INTO mod_ahbot (item_id, min_bid_price)
+            VALUES (%s, %s)
+        """
+        data = (item_id, min_bid_price)
+
+        with self.connection.cursor() as cursor:
+            cursor.execute(sql, data)
+            self.connection.commit()
+
+            row_count = cursor.rowcount
+            if row_count == CURSOR_RESULT_ROW_INSERTED:
+                return InsertResult.INSERTED
+            else:
+                return InsertResult.KEPT_SAME
+
+    def upsert(self, item_id: int, min_bid_price: int) -> InsertResult:
         if not self.connection or not self.connection.is_connected():
             raise RuntimeError("Cannot perform upsert, no connection.")
 
@@ -60,11 +80,11 @@ class Repository:
 
             row_count = cursor.rowcount
             if row_count == CURSOR_RESULT_ROW_INSERTED:
-                return UpsertResult.INSERTED
+                return InsertResult.INSERTED
             elif row_count == CURSOR_RESULT_ROW_UPDATED:
-                return UpsertResult.UPDATED
+                return InsertResult.UPDATED
             elif row_count == CURSOR_RESULT_KEPT_SAME:
-                return UpsertResult.KEPT_SAME
+                return InsertResult.KEPT_SAME
             else:
                 raise RuntimeError(f"Unexpected rowcount value: {row_count}. item_id: {item_id}, min_bid_price: {min_bid_price}")
 

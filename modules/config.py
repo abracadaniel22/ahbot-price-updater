@@ -10,6 +10,8 @@ from .typed_config import TypedConfig
 _schema: Dict[str, Type[Union[str, int, float, bool]]] = {
     'url': str,
     'skip_download': bool,
+    'keep_downloads': bool,
+    'insert_duplicate_behaviour': str,
     'mysql_host': str,
     'mysql_port': str,
     'mysql_user': str,
@@ -29,4 +31,4 @@ def _get_file():
     else:
         raise RuntimeError(f"None of the config files are found: [{config_file}] or [{config_dist_file}].")
 
-config = TypedConfig(_get_file(), _schema)
+config = TypedConfig(_get_file(), _schema, env_prefix="CONFIG_")

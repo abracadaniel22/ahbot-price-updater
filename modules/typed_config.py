@@ -4,37 +4,43 @@ and supports setting values with type validation.
 @author Abracadaniel22
 """
 import configparser
+import os
 from typing import Any, Dict, Type, Union
 
 class TypedConfig:
-    def __init__(self, config_file: str, schema: Dict[str, Type[Union[str, int, float, bool]]], section: str = 'config'):
+    def __init__(self, config_file: str, schema: Dict[str, Type[Union[str, int, float, bool]]], section: str = 'config', env_prefix: str = ''):
         self._config = configparser.ConfigParser()
         self._config.read(config_file)
         self._section = section
         self._schema = schema
         self._config_file = config_file
+        self._env_prefix = env_prefix.upper()
 
     def __getattr__(self, name: str) -> Any:
         if name not in self._schema:
-            raise AttributeError(f"Configuration key '{name}' not defined in schema for {self._config_file}")
-        
-        if not self._config.has_option(self._section, name):
-            return None
-        
-        value = self._config.get(self._section, name)
-        
+            raise AttributeError(f"Configuration key '{name}' not defined in schema")
+        env_var = f"{self._env_prefix}{name.upper()}"
+        if env_var in os.environ:
+            value = os.environ[env_var]
+        else:
+            if not self._config.has_option(self._section, name):
+                return None
+            value = self._config.get(self._section, name)
+
         try:
             target_type = self._schema[name]
             if target_type == bool:
-                return self._config.getboolean(self._section, name)
+                if isinstance(value, str):
+                    return value.lower() in ('true', '1', 'yes', 'on')
+                return bool(value)
             elif target_type == int:
-                return self._config.getint(self._section, name)
+                return int(value)
             elif target_type == float:
-                return self._config.getfloat(self._section, name)
+                return float(value)
             elif target_type == str:
-                return value
-        except ValueError as e:
-            raise ValueError(f"Invalid value for '{name}': {str(e)}")
+                return str(value)
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Invalid value for '{name}': {str(e)}") from e
         
         raise TypeError(f"Unsupported type for key '{name}'")
 

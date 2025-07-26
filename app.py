@@ -4,11 +4,11 @@ Downloads an auctioneer data file and inserts the minimum bid price of every ite
 @author Abracadaniel22
 """
 from collections import Counter
-import sys
+import sys, os
 
 from modules.downloader import download_new_file, DownloadStatus
 from modules.aucdata_parser import parse_auctions
-from modules.repository import Repository, UpsertResult
+from modules.repository import Repository, InsertResult
 from modules.appdata import appdata
 from modules.config import config
 from modules import constants
@@ -36,25 +36,36 @@ def _main():
         if not _is_new_file(aucdata_file):
             print(f"Downloaded file unchanged. Skipping. Latest file remains {appdata.last_file_name}")
             return
-        appdata.last_file_name = aucdata_file
 
     print("Parsing...")
     item_prices = parse_auctions(constants.get_download_file_path(aucdata_file))
+
+    if config.keep_downloads:
+        appdata.last_file_name = aucdata_file
+    elif aucdata_file is not None:
+        print(f"Deleting downloaded file {aucdata_file}...")
+        os.remove(constants.get_download_file_path(aucdata_file))
 
     print("Connecting to the database...")
     repository = Repository()
     stats = Counter()
 
     print("Updating table...")
+    upsert = True
+    if config.insert_duplicate_behaviour == 'ignore':
+        upsert = False
     for item_id, data in item_prices.items():
         if not data['min_prices'] or not data['max_prices']:
             continue
         min_bid_price = min(data['min_prices'])
-        result = repository.upsert(item_id, min_bid_price)
+        if upsert:
+            result = repository.upsert(item_id, min_bid_price)
+        else:
+            result = repository.insert_ignore(item_id, min_bid_price)
         stats[result.name] += 1
     
     get_stat = lambda result_type: stats.get(result_type.name, 0)
-    print(f"{len(item_prices)} items processed. {get_stat(UpsertResult.INSERTED)} new items inserted. {get_stat(UpsertResult.UPDATED)} rows updated. {get_stat(UpsertResult.KEPT_SAME)} rows kept same. {repository.count()} total items now in the table.")
+    print(f"{len(item_prices)} items processed. {get_stat(InsertResult.INSERTED)} new items inserted. {get_stat(InsertResult.UPDATED)} rows updated. {get_stat(InsertResult.KEPT_SAME)} rows kept same. {repository.count()} total items now in the table.")
 
 if __name__ == "__main__":
     _main()

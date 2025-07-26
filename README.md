@@ -16,13 +16,16 @@ This script works by populating the `ac_world.mod_ahbot` table with the minimum 
 git clone https://github.com/abracadaniel22/ahbot-price-updater.git
 ```
 
-- Configure app by copying `config.conf.dist` to `config.conf`
-
 - Build image
 
 ```
 ./build.sh
 ```
+
+## Configuration
+
+- Configure app by copying `config.conf.dist` to `config.conf` and edit settings
+
 
 ## Run
 
@@ -30,4 +33,12 @@ git clone https://github.com/abracadaniel22/ahbot-price-updater.git
 
 ```
 docker run -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
+```
+
+## Overriding configuration
+
+- It is possible to override the values in the config file for a single execution without modifying the config file, just set environment variables matching the keys in the config file, prefixed with `CONFIG_`, example:
+
+```
+docker run -e CONFIG_URL="https://custom-onetime-url.com" -e CONFIG_INSERT_DUPLICATE_BEHAVIOUR=ignore -v /path/to/ahbot-price-updater/etc:/usr/src/app/etc ahbotpriceupdater:latest
 ```
