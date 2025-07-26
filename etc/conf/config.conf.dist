@@ -15,7 +15,7 @@ keep_downloads = true
 insert_duplicate_behaviour = upsert
 
 # DB connection settings
-mysql_host = 192.168.68.127
+mysql_host = 127.0.0.1
 mysql_port = 3306
 mysql_user = acore
 mysql_password = acore
